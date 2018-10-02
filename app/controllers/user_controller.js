@@ -10,7 +10,7 @@ exports.signup = function(req, res) {
     User.create({ name, lastname, email, password: hash })
       .then(user => {
         logger.info(`User ${name} created.`);
-        res.status(200).json({ user });
+        res.status(201).json({ user });
         res.end();
       })
       .catch(error => {
