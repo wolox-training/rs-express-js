@@ -1,6 +1,15 @@
 const { check, validationResult } = require('express-validator/check');
 const User = require('./models').User;
 
+exports.validationResultHandler = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json(errors.array());
+  } else {
+    next();
+  }
+};
+
 exports.validateUser = [
   check('name')
     .exists()
@@ -26,13 +35,5 @@ exports.validateUser = [
     .isLength({ min: 8 })
     .withMessage('Password should be 8 characters minimum')
     .matches(/^[a-zA-Z0-9]*$/)
-    .withMessage('Password should be alphanumeric only'),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json(errors.array());
-    } else {
-      next();
-    }
-  }
+    .withMessage('Password should be alphanumeric only')
 ];
