@@ -1,7 +1,7 @@
 const User = require('../models').User,
   logger = require('../logger');
 
-exports.signup = function(req, res) {
+exports.signup = (req, res) => {
   const { name, lastname, email, password } = req.body;
   User.create({ name, lastname, email, password })
     .then(user => {
