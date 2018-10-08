@@ -23,12 +23,11 @@ exports.validateUser = [
     .withMessage('E-mail is required')
     .matches(/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z]+\.)?(wolox)\.(com|co|com\.ar)$/)
     .withMessage('E-mail must be from wolox domain')
-    .custom(value => {
-      return User.findOne({ where: { email: value } }).then(user => {
-        if (user) {
-          return Promise.reject('E-mail already in use');
-        }
-      });
+    .custom(async email => {
+      const user = await User.findOne({ where: { email } });
+      if (user) {
+        throw new Error('E-mail already in use');
+      }
     }),
   check('password')
     .exists()

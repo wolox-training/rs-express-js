@@ -61,76 +61,74 @@ describe('/users POST', () => {
         done();
       });
   });
-  // it('should send error message of email already in use and return 400', done => {
-  //   User.create(user);
-  //   chai
-  //     .request(app)
-  //     .post('/users')
-  //     .send(user)
-  //     .end(function(err, res) {
-  //       expect(res).to.have.status(400);
-  //       res.should.be.json;
-  //       res.body.should.be.a('object');
-  //       expect(res.body).to.have.property('message');
-  //       expect(res.body).to.have.property('internal_code', 'bad_request');
-  //       expect(res.body.message[0]).to.have.property('value', 'test@wolox.co');
-  //       expect(res.body.message[0]).to.have.property('location', 'body');
-  //       expect(res.body.message[0]).to.have.property('param', 'email');
-  //       expect(res.body.message[0]).to.have.property('msg', 'E-mail already in use');
-  //       done();
-  //     });
-  // });
-  // it('should send error message "lastname is required" and return 400', done => {
-  //   chai
-  //     .request(app)
-  //     .post('/users')
-  //     .send({ name: 'name', email: 'test@wolox.co', password: '12345678' })
-  //     .end(function(err, res) {
-  //       expect(res).to.have.status(400);
-  //       res.should.be.json;
-  //       res.body.should.be.a('Array');
-  //       expect(res.body[0]).to.have.property('location');
-  //       expect(res.body[0]).to.have.property('param');
-  //       expect(res.body[0]).to.have.property('msg');
-  //       res.body[0].location.should.equal('body');
-  //       res.body[0].param.should.equal('lastname');
-  //       res.body[0].msg.should.equal('Lastname is required');
-  //       done();
-  //     });
-  // });
-  // it('should send error message "e-mail is required" and return 400', done => {
-  //   chai
-  //     .request(app)
-  //     .post('/users')
-  //     .send({ name: 'name', lastname: 'lastname', password: '12345678' })
-  //     .end(function(err, res) {
-  //       expect(res).to.have.status(400);
-  //       res.should.be.json;
-  //       res.body.should.be.a('Array');
-  //       expect(res.body[0]).to.have.property('location');
-  //       expect(res.body[0]).to.have.property('param');
-  //       expect(res.body[0]).to.have.property('msg');
-  //       res.body[0].location.should.equal('body');
-  //       res.body[0].param.should.equal('email');
-  //       res.body[0].msg.should.equal('E-mail is required');
-  //       done();
-  //     });
-  // });
-  // it('should send error message "name is required" and return 400', done => {
-  //   chai
-  //     .request(app)
-  //     .post('/users')
-  //     .send({ lastname: 'lastname', email: 'test@wolox.co', password: '12345678' })
-  //     .end(function(err, res) {
-  //       expect(res).to.have.status(400);
-  //       res.should.be.json;
-  //       res.body.should.be.a('Array');
-  //       expect(res.body[0]).to.have.property('location');
-  //       expect(res.body[0]).to.have.property('param');
-  //       expect(res.body[0]).to.have.property('msg');
-  //       res.body[0].location.should.equal('body');
-  //       res.body[0].param.should.equal('name');
-  //       res.body[0].msg.should.equal('Name is required');
-  //       done();
-  //     });
+  it('should send error message of email already in use and return 400', async () => {
+    await User.create(user).then(() => {
+      chai
+        .request(app)
+        .post('/users')
+        .send(user)
+        .end(function(err, res) {
+          expect(res).to.have.status(400);
+          res.should.be.json;
+          res.body.should.be.a('object');
+          expect(res.body).to.have.property('message');
+          expect(res.body).to.have.property('internal_code', 'bad_request');
+          expect(res.body.message[0]).to.have.property('value', 'test@wolox.co');
+          expect(res.body.message[0]).to.have.property('location', 'body');
+          expect(res.body.message[0]).to.have.property('param', 'email');
+          expect(res.body.message[0]).to.have.property('msg', 'E-mail already in use');
+        });
+    });
+  });
+  it('should send error message "lastname is required" and return 400', done => {
+    chai
+      .request(app)
+      .post('/users')
+      .send({ name: 'name', email: 'test@wolox.co', password: '12345678' })
+      .end(function(err, res) {
+        expect(res).to.have.status(400);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        expect(res.body).to.have.property('message');
+        expect(res.body).to.have.property('internal_code', 'bad_request');
+        expect(res.body.message[0]).to.have.property('location', 'body');
+        expect(res.body.message[0]).to.have.property('param', 'lastname');
+        expect(res.body.message[0]).to.have.property('msg', 'Lastname is required');
+        done();
+      });
+  });
+  it('should send error message "e-mail is required" and return 400', done => {
+    chai
+      .request(app)
+      .post('/users')
+      .send({ name: 'name', lastname: 'lastname', password: '12345678' })
+      .end(function(err, res) {
+        expect(res).to.have.status(400);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        expect(res.body).to.have.property('message');
+        expect(res.body).to.have.property('internal_code', 'bad_request');
+        expect(res.body.message[0]).to.have.property('location', 'body');
+        expect(res.body.message[0]).to.have.property('param', 'email');
+        expect(res.body.message[0]).to.have.property('msg', 'E-mail is required');
+        done();
+      });
+  });
+  it('should send error message "name is required" and return 400', done => {
+    chai
+      .request(app)
+      .post('/users')
+      .send({ lastname: 'lastname', email: 'test@wolox.co', password: '12345678' })
+      .end(function(err, res) {
+        expect(res).to.have.status(400);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        expect(res.body).to.have.property('message');
+        expect(res.body).to.have.property('internal_code', 'bad_request');
+        expect(res.body.message[0]).to.have.property('location', 'body');
+        expect(res.body.message[0]).to.have.property('param', 'name');
+        expect(res.body.message[0]).to.have.property('msg', 'Name is required');
+        done();
+      });
+  });
 });
