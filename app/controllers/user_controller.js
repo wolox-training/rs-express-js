@@ -2,7 +2,7 @@ const User = require('../models').User,
   logger = require('../logger'),
   error = require('../errors');
 
-exports.signUp = function(req, res) {
+exports.signUp = (req, res, next) => {
   const { name, lastname, email, password } = req.body;
   User.create({ name, lastname, email, password })
     .then(user => {
@@ -13,7 +13,6 @@ exports.signUp = function(req, res) {
         .end();
     })
     .catch(err => {
-      logger.error(err);
-      throw error.dataBaseError(err);
+      next(error.dataBaseError(err.errors[0].message));
     });
 };
