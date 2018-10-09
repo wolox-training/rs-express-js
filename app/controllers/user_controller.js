@@ -1,5 +1,6 @@
 const User = require('../models').User,
-  logger = require('../logger');
+  logger = require('../logger'),
+  error = require('../errors');
 
 exports.signUp = (req, res, next) => {
   const { name, lastname, email, password } = req.body;
@@ -9,5 +10,7 @@ exports.signUp = (req, res, next) => {
       res.status(201).json({ user });
       res.end();
     })
-    .catch(next);
+    .catch(err => {
+      next(error.dataBaseError(err.errors[0].message));
+    });
 };
