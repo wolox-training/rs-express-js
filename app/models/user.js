@@ -20,9 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   User.prototype.validatePassword = function validatePassword(password) {
-    bcrypt.compare(password, this.password, function(res) {
-      return res;
-    });
+    return bcrypt.compareSync(password, this.password);
   };
 
   User.beforeCreate((user, options) => {

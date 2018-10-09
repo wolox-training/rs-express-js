@@ -21,12 +21,14 @@ exports.signUp = function(req, res) {
     });
 };
 
-exports.signIn = function(req, res) {
+exports.signIn = function(req, res, next) {
   const { email, password } = req.body;
   return User.findOne({ where: { email } }).then(user => {
-    if (!user) throw error.unAuthorizedError('Invalid credentials');
-    if (!user.validatePassword(password)) throw error.unAuthorizedError('Invalid credentials');
-    const token = jwt.sign({ id: user._id }, config.common.session.secret);
-    res.status(200).send({ auth: true, token });
+    if (!user) next(error.unAuthorizedError('Invalid credentials'));
+    if (!user.validatePassword(password)) next(error.unAuthorizedError('Invalid credentials'));
+    if (user && user.validatePassword(password)) {
+      const token = jwt.sign({ id: user._id }, config.common.session.secret);
+      res.status(200).send({ auth: true, token });
+    }
   });
 };
