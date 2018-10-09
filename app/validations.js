@@ -1,16 +1,7 @@
 const { check, validationResult } = require('express-validator/check');
 const User = require('./models').User;
 
-exports.validationResultHandler = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    res.status(400).json(errors.array());
-  } else {
-    next();
-  }
-};
-
-exports.validateUser = [
+exports.signUp = [
   check('name')
     .exists()
     .withMessage('Name is required'),
@@ -37,3 +28,15 @@ exports.validateUser = [
     .matches(/^[a-zA-Z0-9]*$/)
     .withMessage('Password should be alphanumeric only')
 ];
+
+exports.validationResultHandler = checkArray => {
+  checkArray.push((req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json(errors.array());
+    } else {
+      next();
+    }
+  });
+  return checkArray;
+};
