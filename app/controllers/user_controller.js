@@ -30,3 +30,12 @@ exports.signIn = function(req, res, next) {
     }
   });
 };
+
+exports.getAllUsers = function(req, res, next) {
+  User.findAll().then(users => {
+    res
+      .status(200)
+      .json({ users })
+      .end();
+  });
+};

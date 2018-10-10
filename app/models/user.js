@@ -23,10 +23,17 @@ module.exports = (sequelize, DataTypes) => {
     return bcrypt.compareSync(password, this.password);
   };
 
+  User.prototype.toJSON = function() {
+    const values = Object.assign({}, this.get());
+    delete values.password;
+    return values;
+  };
+
   User.beforeCreate((user, options) => {
     return bcrypt.hash(user.password, 10).then(hash => {
       user.password = hash;
     });
   });
+
   return User;
 };
