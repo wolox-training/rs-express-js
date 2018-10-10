@@ -19,7 +19,7 @@ exports.signUp = (req, res, next) => {
     });
 };
 
-exports.signIn = function(req, res, next) {
+exports.signIn = (req, res, next) => {
   const { email, password } = req.body;
   return User.findOne({ where: { email } }).then(user => {
     if (!user) next(error.unAuthorizedError('Invalid credentials'));
@@ -34,11 +34,21 @@ exports.signIn = function(req, res, next) {
   });
 };
 
-exports.getAllUsers = function(req, res, next) {
-  User.findAll().then(users => {
-    res
-      .status(200)
-      .json({ users })
-      .end();
-  });
+exports.getAllUsers = (req, res, next) => {
+  const limit = 5;
+  let offset = 0;
+  User.findAndCountAll()
+    .then(data => {
+      const pages = Math.ceil(data.count / limit);
+      offset = limit * (req.query.page - 1);
+      User.findAll({
+        limit,
+        offset
+      }).then(users => {
+        res.status(200).json({ result: users, count: data.count, pages });
+      });
+    })
+    .catch(err => {
+      next(error.dataBaseError(err.errors[0].message));
+    });
 };

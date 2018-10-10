@@ -41,6 +41,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
+    "cookie": "^0.3.1",
     "deep-extend": "^0.6.0",
     "express": "^4.16.2",
     "express-validator": "^5.3.0",

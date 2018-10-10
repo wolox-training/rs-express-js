@@ -4,7 +4,30 @@ const chai = require('chai'),
   should = chai.should(),
   expect = chai.expect,
   User = require('./../app/models').User,
-  user = { name: 'name', lastname: 'lastname', email: 'test@wolox.co', password: '12345678' };
+  user = { name: 'name', lastname: 'lastname', email: 'test@wolox.co', password: '12345678' },
+  cookie = require('cookie'),
+  createUser = _ =>
+    chai
+      .request(app)
+      .post('/users/')
+      .send(user);
+
+const loginUser = _ =>
+  chai
+    .request(app)
+    .post('/users/sessions')
+    .send({ email: user.email, password: user.password });
+
+const getToken = res => {
+  const cookies = res.headers['set-cookie'];
+  let token;
+  if (cookies) {
+    cookies.forEach(function(icookie) {
+      token = cookie.parse(icookie)['x-access-token'];
+    });
+  }
+  return token;
+};
 
 describe('/users POST', () => {
   it('should create a valid user and return 201', done => {
@@ -62,24 +85,20 @@ describe('/users POST', () => {
       });
   });
   it('should fail, email already in use for another user', done => {
-    chai
-      .request(app)
-      .post('/users/')
-      .send(user)
-      .then(() => {
-        chai
-          .request(app)
-          .post('/users/')
-          .send(user)
-          .end(function(err, res) {
-            expect(res).to.have.status(500);
-            res.should.be.json;
-            res.body.should.be.a('object');
-            expect(res.body).to.have.property('message', 'email must be unique');
-            expect(res.body).to.have.property('internal_code', 'database_error');
-            done();
-          });
-      });
+    createUser().then(() => {
+      chai
+        .request(app)
+        .post('/users/')
+        .send(user)
+        .end(function(err, res) {
+          expect(res).to.have.status(500);
+          res.should.be.json;
+          res.body.should.be.a('object');
+          expect(res.body).to.have.property('message', 'email must be unique');
+          expect(res.body).to.have.property('internal_code', 'database_error');
+          done();
+        });
+    });
   });
   it('should send error message "lastname is required" and return 400', done => {
     chai
@@ -180,8 +199,7 @@ describe('/users/sessions POST', () => {
           res.should.be.json;
           res.body.should.be.a('object');
           expect(res.body).to.have.property('auth', true);
-          expect(res.body).to.have.property('token');
-          expect(res.body.token).to.be.a('string');
+          expect(res).to.have.cookie('x-access-token');
           dictum.chai(res, 'Login user');
           done();
         });
@@ -253,5 +271,22 @@ describe('/users/sessions POST', () => {
         expect(res.body.message[0]).to.have.property('msg', 'Password is required');
         done();
       });
+  });
+});
+
+describe('/users/page=1 GET', () => {
+  it('should get a list of users return 200', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=1')
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(200);
+            done();
+          });
+      });
+    });
   });
 });
