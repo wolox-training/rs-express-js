@@ -26,7 +26,10 @@ exports.signIn = function(req, res, next) {
     if (!user.validatePassword(password)) next(error.unAuthorizedError('Invalid credentials'));
     if (user && user.validatePassword(password)) {
       const token = jwt.sign({ id: user._id }, config.common.session.secret);
-      res.status(200).send({ auth: true, token });
+      res
+        .status(200)
+        .cookie('x-access-token', token)
+        .send({ auth: true });
     }
   });
 };
