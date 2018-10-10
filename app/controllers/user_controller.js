@@ -37,18 +37,23 @@ exports.signIn = (req, res, next) => {
 exports.getAllUsers = (req, res, next) => {
   const limit = 5;
   let offset = 0;
+  const page = req.query.page || 1;
   User.findAndCountAll()
     .then(data => {
       const pages = Math.ceil(data.count / limit);
-      offset = limit * (req.query.page - 1);
+      offset = limit * (page - 1);
       User.findAll({
         limit,
         offset
-      }).then(users => {
-        res.status(200).json({ result: users, count: data.count, pages });
-      });
+      })
+        .then(users => {
+          res.status(200).json({ users, count: data.count, pages });
+        })
+        .catch(err => {
+          next(error.dataBaseError('Error in query to find all users'));
+        });
     })
     .catch(err => {
-      next(error.dataBaseError(err.errors[0].message));
+      next(error.dataBaseError('Error in query to find and count all users'));
     });
 };

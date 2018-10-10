@@ -284,6 +284,108 @@ describe('/users/page=1 GET', () => {
           .set('x-access-token', getToken(res))
           .end(function(err, response) {
             expect(response).to.have.status(200);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('users');
+            response.body.users.should.be.a('array');
+            expect(response.body.users.length).to.equal(1);
+            expect(response.body).to.have.property('count', 1);
+            expect(response.body).to.have.property('pages', 1);
+            dictum.chai(res, 'Get all users');
+            done();
+          });
+      });
+    });
+  });
+  it('should get a empty list of users return 200', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=100')
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(200);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('users');
+            response.body.users.should.be.a('array');
+            expect(response.body.users.length).to.equal(0);
+            expect(response.body).to.have.property('count', 1);
+            expect(response.body).to.have.property('pages', 1);
+            done();
+          });
+      });
+    });
+  });
+  it('should return the first page, no matter the page param, and return 200', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users')
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(200);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('users');
+            response.body.users.should.be.a('array');
+            expect(response.body).to.have.property('count', 1);
+            expect(response.body).to.have.property('pages', 1);
+            done();
+          });
+      });
+    });
+  });
+  it('should get a message error because the offset is negative and return 500', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=-5')
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(500);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('message', 'Error in query to find all users');
+            expect(response.body).to.have.property('internal_code', 'database_error');
+            done();
+          });
+      });
+    });
+  });
+  it('should get a message error because invalid token and return 401', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=1')
+          .set('x-access-token', 'invalid token')
+          .end(function(err, response) {
+            expect(response).to.have.status(401);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('message', 'Unauthorized access');
+            expect(response.body).to.have.property('internal_code', 'unauthorized');
+            done();
+          });
+      });
+    });
+  });
+  it('should get a message error because no token provided and return 400', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=1')
+          .end(function(err, response) {
+            expect(response).to.have.status(400);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('message', 'No token provided');
+            expect(response.body).to.have.property('internal_code', 'bad_request');
             done();
           });
       });
