@@ -4,6 +4,16 @@ const { check, validationResult } = require('express-validator/check'),
   jwt = require('jsonwebtoken'),
   config = require('../config');
 
+exports.isAuthenticatedAsAdmin = (req, res, next) => {
+  User.findOne({ where: { email: req.decoded.id } }).then(user => {
+    if (user.isAdmin) {
+      next();
+    } else {
+      next(error.unAuthorizedError('Unauthorized access'));
+    }
+  });
+};
+
 exports.isAuthenticated = (req, res, next) => {
   const token = req.headers['x-access-token'];
   if (token) {

@@ -5,4 +5,11 @@ exports.init = app => {
   app.get('/users', validate.isAuthenticated, userController.getAllUsers);
   app.post('/users', validate.validationResultHandler(validate.signUp), userController.signUp);
   app.post('/users/sessions', validate.validationResultHandler(validate.signIn), userController.signIn);
+  app.post(
+    '/admin/users',
+    validate.validationResultHandler(validate.signUp),
+    validate.isAuthenticated,
+    validate.isAuthenticatedAsAdmin,
+    userController.createAdminUser
+  );
 };
