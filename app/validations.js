@@ -4,7 +4,7 @@ const { check, validationResult } = require('express-validator/check'),
   jwt = require('jsonwebtoken'),
   config = require('../config');
 
-exports.isAuthenticatedAsAdmin = (req, res, next) => {
+exports.isAdmin = (req, res, next) => {
   User.findOne({ where: { email: req.decoded.id } }).then(user => {
     if (user.isAdmin) {
       next();

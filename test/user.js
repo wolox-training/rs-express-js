@@ -12,11 +12,12 @@ const chai = require('chai'),
       .post('/users/')
       .send(user);
 
-const loginUser = _ =>
-  chai
+const loginUser = usr => {
+  return chai
     .request(app)
     .post('/users/sessions')
-    .send({ email: user.email, password: user.password });
+    .send({ email: usr.email, password: usr.password });
+};
 
 const getToken = res => {
   const cookies = res.headers['set-cookie'];
@@ -277,7 +278,7 @@ describe('/users/sessions POST', () => {
 describe('/users/page=1 GET', () => {
   it('should get a list of users return 200', done => {
     createUser().then(() => {
-      loginUser().then(res => {
+      loginUser(user).then(res => {
         chai
           .request(app)
           .get('/users?page=1')
@@ -299,7 +300,7 @@ describe('/users/page=1 GET', () => {
   });
   it('should get a empty list of users return 200', done => {
     createUser().then(() => {
-      loginUser().then(res => {
+      loginUser(user).then(res => {
         chai
           .request(app)
           .get('/users?page=100')
@@ -320,7 +321,7 @@ describe('/users/page=1 GET', () => {
   });
   it('should return the first page, no matter the page param, and return 200', done => {
     createUser().then(() => {
-      loginUser().then(res => {
+      loginUser(user).then(res => {
         chai
           .request(app)
           .get('/users')
@@ -340,7 +341,7 @@ describe('/users/page=1 GET', () => {
   });
   it('should get a message error because the offset is negative and return 500', done => {
     createUser().then(() => {
-      loginUser().then(res => {
+      loginUser(user).then(res => {
         chai
           .request(app)
           .get('/users?page=-5')
@@ -358,7 +359,7 @@ describe('/users/page=1 GET', () => {
   });
   it('should get a message error because invalid token and return 401', done => {
     createUser().then(() => {
-      loginUser().then(res => {
+      loginUser(user).then(res => {
         chai
           .request(app)
           .get('/users?page=1')
@@ -376,7 +377,7 @@ describe('/users/page=1 GET', () => {
   });
   it('should get a message error because no token provided and return 400', done => {
     createUser().then(() => {
-      loginUser().then(res => {
+      loginUser(user).then(res => {
         chai
           .request(app)
           .get('/users?page=1')
@@ -386,6 +387,57 @@ describe('/users/page=1 GET', () => {
             response.body.should.be.a('object');
             expect(response.body).to.have.property('message', 'No token provided');
             expect(response.body).to.have.property('internal_code', 'bad_request');
+            done();
+          });
+      });
+    });
+  });
+});
+describe('/admin/users POST', () => {
+  it('should create a new admin user and return 201', done => {
+    User.create({
+      name: 'name',
+      lastname: 'lastname',
+      email: 'test@wolox.co',
+      password: '12345678',
+      isAdmin: true
+    }).then(usr => {
+      loginUser({ email: usr.email, password: '12345678' }).then(res => {
+        chai
+          .request(app)
+          .post('/admin/users')
+          .send(user)
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(201);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            response.body.user.should.have.property('name');
+            response.body.user.should.have.property('lastname');
+            response.body.user.should.have.property('id');
+            response.body.user.name.should.equal('name');
+            response.body.user.lastname.should.equal('lastname');
+            response.body.user.isAdmin.should.equal(true);
+            dictum.chai(response, 'Create user');
+            done();
+          });
+      });
+    });
+  });
+  it('should send an error message because a regular-user try to create a admin-user and return 401', done => {
+    createUser().then(() => {
+      loginUser(user).then(res => {
+        chai
+          .request(app)
+          .post('/admin/users')
+          .send(user)
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(401);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('message');
+            expect(response.body).to.have.property('internal_code', 'unauthorized');
             done();
           });
       });

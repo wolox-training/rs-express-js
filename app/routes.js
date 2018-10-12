@@ -9,7 +9,7 @@ exports.init = app => {
     '/admin/users',
     validate.validationResultHandler(validate.signUp),
     validate.isAuthenticated,
-    validate.isAuthenticatedAsAdmin,
+    validate.isAdmin,
     userController.createAdminUser
   );
 };
