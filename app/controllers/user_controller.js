@@ -7,8 +7,10 @@ exports.signUp = (req, res, next) => {
   User.create({ name, lastname, email, password })
     .then(user => {
       logger.info(`User ${name} created.`);
-      res.status(201).json({ user });
-      res.end();
+      res
+        .status(201)
+        .json({ user })
+        .end();
     })
     .catch(err => {
       next(error.dataBaseError(err.errors[0].message));
