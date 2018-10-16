@@ -32,7 +32,6 @@ const init = () => {
   // Client must send "Content-Type: application/json" header
   app.use(bodyParser.json(bodyParserJsonConfig()));
   app.use(bodyParser.urlencoded(bodyParserUrlencodedConfig()));
-
   if (!config.isTesting) {
     morgan.token('req-params', req => req.params);
     app.use(
