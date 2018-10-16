@@ -1,6 +1,6 @@
 const userController = require('./controllers/user_controller');
-const validate = require('./validations');
+const { signUp, validationResultHandler } = require('./middlewares/validations');
 
 exports.init = app => {
-  app.post('/users', validate.validationResultHandler(validate.signUp), userController.signUp);
+  app.post('/users', validationResultHandler(signUp), userController.signUp);
 };

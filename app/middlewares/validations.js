@@ -1,6 +1,6 @@
 const { check, validationResult } = require('express-validator/check'),
-  User = require('./models').User,
-  error = require('./errors');
+  User = require('../models').User,
+  error = require('../errors');
 
 exports.signUp = [
   check('name')
