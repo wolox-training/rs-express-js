@@ -1,8 +1,8 @@
 const { check, validationResult } = require('express-validator/check'),
-  User = require('./models').User,
-  error = require('./errors'),
+  User = require('../models').User,
+  error = require('../errors'),
   jwt = require('jsonwebtoken'),
-  config = require('../config');
+  config = require('../../config');
 
 exports.isAuthenticated = (req, res, next) => {
   const token = req.headers['x-access-token'];
