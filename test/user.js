@@ -64,24 +64,25 @@ describe('/users POST', () => {
         done();
       });
   });
-  it('should send error message of email already in use and return 400', async () => {
-    await User.create(user).then(() => {
-      chai
-        .request(app)
-        .post('/users')
-        .send(user)
-        .end(function(err, res) {
-          expect(res).to.have.status(400);
-          res.should.be.json;
-          res.body.should.be.a('object');
-          expect(res.body).to.have.property('message');
-          expect(res.body).to.have.property('internal_code', 'bad_request');
-          expect(res.body.message[0]).to.have.property('value', 'test@wolox.co');
-          expect(res.body.message[0]).to.have.property('location', 'body');
-          expect(res.body.message[0]).to.have.property('param', 'email');
-          expect(res.body.message[0]).to.have.property('msg', 'E-mail already in use');
-        });
-    });
+  it('should fail, email already in use for another user', done => {
+    chai
+      .request(app)
+      .post('/users/')
+      .send(user)
+      .then(() => {
+        chai
+          .request(app)
+          .post('/users/')
+          .send(user)
+          .end(function(err, res) {
+            expect(res).to.have.status(500);
+            res.should.be.json;
+            res.body.should.be.a('object');
+            expect(res.body).to.have.property('message', 'email must be unique');
+            expect(res.body).to.have.property('internal_code', 'database_error');
+            done();
+          });
+      });
   });
   it('should send error message "lastname is required" and return 400', done => {
     chai
@@ -131,6 +132,128 @@ describe('/users POST', () => {
         expect(res.body.message[0]).to.have.property('location', 'body');
         expect(res.body.message[0]).to.have.property('param', 'name');
         expect(res.body.message[0]).to.have.property('msg', 'Name is required');
+        done();
+      });
+  });
+  it('should send error message "email must be from wolox domain" and return 400', done => {
+    chai
+      .request(app)
+      .post('/users')
+      .send({ name: user.name, lastname: user.lastname, email: 'test@hotmail.com', password: user.password })
+      .end(function(err, res) {
+        expect(res).to.have.status(400);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        expect(res.body).to.have.property('message');
+        expect(res.body).to.have.property('internal_code', 'bad_request');
+        expect(res.body.message[0]).to.have.property('location', 'body');
+        expect(res.body.message[0]).to.have.property('param', 'email');
+        expect(res.body.message[0]).to.have.property('msg', 'E-mail must be from wolox domain');
+        done();
+      });
+  });
+  it('should send error message "password is required" and return 400', done => {
+    chai
+      .request(app)
+      .post('/users')
+      .send({ name: user.name, lastname: user.lastname, email: user.email })
+      .end(function(err, res) {
+        expect(res).to.have.status(400);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        expect(res.body).to.have.property('message');
+        expect(res.body).to.have.property('internal_code', 'bad_request');
+        expect(res.body.message[0]).to.have.property('location', 'body');
+        expect(res.body.message[0]).to.have.property('param', 'password');
+        expect(res.body.message[0]).to.have.property('msg', 'Password is required');
+        done();
+      });
+  });
+});
+
+describe('/users/sessions POST', () => {
+  it('should login a user and return 200', done => {
+    User.create(user).then(() => {
+      chai
+        .request(app)
+        .post('/users/sessions')
+        .send({ email: user.email, password: user.password })
+        .end(function(err, res) {
+          expect(res).to.have.status(200);
+          res.should.be.json;
+          res.body.should.be.a('object');
+          expect(res.body).to.have.property('auth', true);
+          expect(res.body).to.have.property('token');
+          expect(res.body.token).to.be.a('string');
+          dictum.chai(res, 'Login user');
+          done();
+        });
+    });
+  });
+  it('should send error message invalid credentials a user and return 401', done => {
+    User.create(user).then(() => {
+      chai
+        .request(app)
+        .post('/users/sessions')
+        .send({ email: user.email, password: 'invalid' })
+        .end(function(err, res) {
+          expect(res).to.have.status(401);
+          res.should.be.json;
+          res.body.should.be.a('object');
+          expect(res.body).to.have.property('message');
+          expect(res.body).to.have.property('internal_code', 'unauthorized');
+          done();
+        });
+    });
+  });
+  it('should send error message "e-mail is required" and return 400', done => {
+    chai
+      .request(app)
+      .post('/users/sessions')
+      .send({ password: user.password })
+      .end(function(err, res) {
+        expect(res).to.have.status(400);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        expect(res.body).to.have.property('message');
+        expect(res.body).to.have.property('internal_code', 'bad_request');
+        expect(res.body.message[0]).to.have.property('location', 'body');
+        expect(res.body.message[0]).to.have.property('param', 'email');
+        expect(res.body.message[0]).to.have.property('msg', 'E-mail is required');
+        done();
+      });
+  });
+  it('should send error message "email must be from wolox domain" and return 400', done => {
+    chai
+      .request(app)
+      .post('/users/sessions')
+      .send({ email: 'test@hotmail.com', password: '12345678' })
+      .end(function(err, res) {
+        expect(res).to.have.status(400);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        expect(res.body).to.have.property('message');
+        expect(res.body).to.have.property('internal_code', 'bad_request');
+        expect(res.body.message[0]).to.have.property('location', 'body');
+        expect(res.body.message[0]).to.have.property('param', 'email');
+        expect(res.body.message[0]).to.have.property('msg', 'E-mail must be from wolox domain');
+        done();
+      });
+  });
+  it('should send error message "password is required" and return 400', done => {
+    chai
+      .request(app)
+      .post('/users/sessions')
+      .send({ email: user.email })
+      .end(function(err, res) {
+        expect(res).to.have.status(400);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        expect(res.body).to.have.property('message');
+        expect(res.body).to.have.property('internal_code', 'bad_request');
+        expect(res.body.message[0]).to.have.property('location', 'body');
+        expect(res.body.message[0]).to.have.property('param', 'password');
+        expect(res.body.message[0]).to.have.property('msg', 'Password is required');
         done();
       });
   });

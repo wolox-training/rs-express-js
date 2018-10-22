@@ -23,6 +23,17 @@ exports.signUp = [
     .withMessage('Password should be alphanumeric only')
 ];
 
+exports.signIn = [
+  check('email')
+    .exists()
+    .withMessage('E-mail is required')
+    .matches(/^[a-zA-Z0-9_.+-]+@(?:(?:[a-zA-Z0-9-]+\.)?[a-zA-Z]+\.)?(wolox)\.(com|co|com\.ar)$/)
+    .withMessage('E-mail must be from wolox domain'),
+  check('password')
+    .exists()
+    .withMessage('Password is required')
+];
+
 exports.validationResultHandler = checkArray => {
   checkArray.push((req, res, next) => {
     const errors = validationResult(req);
