@@ -37,6 +37,9 @@ describe('/users POST', () => {
       .post('/users')
       .send(user)
       .end(function(err, res) {
+        User.count().then(count => {
+          count.should.equal(1);
+        });
         expect(res).to.have.status(201);
         res.should.be.json;
         res.body.should.be.a('object');

@@ -1,8 +1,8 @@
 const { check, validationResult } = require('express-validator/check'),
-  User = require('./models').User,
-  error = require('./errors'),
+  User = require('../models').User,
+  error = require('../errors'),
   jwt = require('jsonwebtoken'),
-  config = require('../config');
+  config = require('../../config');
 
 exports.isAdmin = (req, res, next) => {
   User.findOne({ where: { email: req.decoded.id } }).then(user => {
