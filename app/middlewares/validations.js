@@ -1,13 +1,13 @@
 const { check, validationResult } = require('express-validator/check'),
-  User = require('./models').User,
-  error = require('./errors'),
+  User = require('../models').User,
+  error = require('../errors'),
   jwt = require('jsonwebtoken'),
-  config = require('../config');
+  config = require('../../config');
 
 exports.isAuthenticated = (req, res, next) => {
   const token = req.headers['x-access-token'];
   if (token) {
-    jwt.verify(token, config.common.session.secret, function(err, decoded) {
+    jwt.verify(token, config.common.session.secret, (err, decoded) => {
       if (err) next(error.unAuthorizedError('Unauthorized access'));
       req.decoded = decoded;
       next();

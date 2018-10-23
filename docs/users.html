@@ -15,9 +15,10 @@
     "name": "name",
     "lastname": "lastname",
     "email": "test@wolox.co",
-    "password": "$2b$10$52VI/1qFmwLMz6GHsWGpwOcD0laIc4v/CfZHVcoqdNDVnv.oCKyJa",
-    "updatedAt": "2018-10-10T14:44:40.449Z",
-    "createdAt": "2018-10-10T14:44:40.449Z"
+    "password": "$2b$10$KG.Vm6JQEHR3At3FyCI/ROiPwsJVKG23Hdh9P2dsIuQSCLSJzc/Xq",
+    "updatedAt": "2018-10-23T19:46:37.755Z",
+    "createdAt": "2018-10-23T19:46:37.755Z",
+    "isAdmin": false
   }
 }</pre></div></div></div></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-sessions-POST"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-sessions-POST" href="#collapse-users-sessions-POST">POST /users/sessions</a></h4></div><div id="collapse-users-sessions-POST" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-sessions-POST"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
   "content-type": "application/json",
@@ -29,6 +30,16 @@
   "content-type": "application/json",
   "content-length": 47
 }</pre><h5>Body</h5><pre>{
-  "auth": true,
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MzkxODI2ODB9.BnM2JMMdcLtUxpZ1kwiPh9Crfft288B6MIFC1v6a2jo"
+  "auth": true
+}</pre></div></div></div></div><div class="panel panel-default"><div class="panel-heading" role="tab" id="heading-users-sessions-POST"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" aria-expanded="true" aria-controls="collapse-users-sessions-POST" href="#collapse-users-sessions-POST">POST /users/sessions</a></h4></div><div id="collapse-users-sessions-POST" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-users-sessions-POST"><div class="panel-body"><h4>Request Data</h4><div class="container"><h5>Headers</h5><pre>{
+  "content-type": "application/json",
+  "content-length": 47
+}</pre><h5>Body</h5><pre>{
+  "email": "test@wolox.co",
+  "password": "12345678"
+}</pre></div></div><div class="panel-body"><h4>Response Data</h4><div class="container"><h5>Status: 200</h5><h5>Headers</h5><pre>{
+  "content-type": "application/json",
+  "content-length": 47
+}</pre><h5>Body</h5><pre>{
+  "auth": true
 }</pre></div></div></div></div></div></body></html>

@@ -4,7 +4,30 @@ const chai = require('chai'),
   should = chai.should(),
   expect = chai.expect,
   User = require('./../app/models').User,
-  user = { name: 'name', lastname: 'lastname', email: 'test@wolox.co', password: '12345678' };
+  user = { name: 'name', lastname: 'lastname', email: 'test@wolox.co', password: '12345678' },
+  cookie = require('cookie'),
+  createUser = () =>
+    chai
+      .request(app)
+      .post('/users/')
+      .send(user);
+
+const loginUser = () =>
+  chai
+    .request(app)
+    .post('/users/sessions')
+    .send({ email: user.email, password: user.password });
+
+const getToken = res => {
+  const cookies = res.headers['set-cookie'];
+  let token;
+  if (cookies) {
+    cookies.forEach(function(icookie) {
+      token = cookie.parse(icookie)['x-access-token'];
+    });
+  }
+  return token;
+};
 
 describe('/users POST', () => {
   it('should create a valid user and return 201', done => {
@@ -13,6 +36,9 @@ describe('/users POST', () => {
       .post('/users')
       .send(user)
       .end(function(err, res) {
+        User.count().then(count => {
+          count.should.equal(1);
+        });
         expect(res).to.have.status(201);
         res.should.be.json;
         res.body.should.be.a('object');
@@ -62,24 +88,20 @@ describe('/users POST', () => {
       });
   });
   it('should fail, email already in use for another user', done => {
-    chai
-      .request(app)
-      .post('/users/')
-      .send(user)
-      .then(() => {
-        chai
-          .request(app)
-          .post('/users/')
-          .send(user)
-          .end(function(err, res) {
-            expect(res).to.have.status(500);
-            res.should.be.json;
-            res.body.should.be.a('object');
-            expect(res.body).to.have.property('message', 'email must be unique');
-            expect(res.body).to.have.property('internal_code', 'database_error');
-            done();
-          });
-      });
+    createUser().then(() => {
+      chai
+        .request(app)
+        .post('/users/')
+        .send(user)
+        .end(function(err, res) {
+          expect(res).to.have.status(500);
+          res.should.be.json;
+          res.body.should.be.a('object');
+          expect(res.body).to.have.property('message', 'email must be unique');
+          expect(res.body).to.have.property('internal_code', 'database_error');
+          done();
+        });
+    });
   });
   it('should send error message "lastname is required" and return 400', done => {
     chai
@@ -180,8 +202,7 @@ describe('/users/sessions POST', () => {
           res.should.be.json;
           res.body.should.be.a('object');
           expect(res.body).to.have.property('auth', true);
-          expect(res.body).to.have.property('token');
-          expect(res.body.token).to.be.a('string');
+          expect(res).to.have.cookie('x-access-token');
           dictum.chai(res, 'Login user');
           done();
         });
@@ -253,5 +274,124 @@ describe('/users/sessions POST', () => {
         expect(res.body.message[0]).to.have.property('msg', 'Password is required');
         done();
       });
+  });
+});
+
+describe('/users/page=1 GET', () => {
+  it('should get a list of users return 200', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=1')
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(200);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('users');
+            response.body.users.should.be.a('array');
+            expect(response.body.users.length).to.equal(1);
+            expect(response.body).to.have.property('count', 1);
+            expect(response.body).to.have.property('pages', 1);
+            dictum.chai(res, 'Get all users');
+            done();
+          });
+      });
+    });
+  });
+  it('should get a empty list of users return 200', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=100')
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(200);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('users');
+            response.body.users.should.be.a('array');
+            expect(response.body.users.length).to.equal(0);
+            expect(response.body).to.have.property('count', 1);
+            expect(response.body).to.have.property('pages', 1);
+            done();
+          });
+      });
+    });
+  });
+  it('should return the first page, no matter the page param, and return 200', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users')
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(200);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('users');
+            response.body.users.should.be.a('array');
+            expect(response.body).to.have.property('count', 1);
+            expect(response.body).to.have.property('pages', 1);
+            done();
+          });
+      });
+    });
+  });
+  it('should get a message error because the offset is negative and return 500', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=-5')
+          .set('x-access-token', getToken(res))
+          .end(function(err, response) {
+            expect(response).to.have.status(500);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('message', 'Error in query to find all users');
+            expect(response.body).to.have.property('internal_code', 'database_error');
+            done();
+          });
+      });
+    });
+  });
+  it('should get a message error because invalid token and return 401', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=1')
+          .set('x-access-token', 'invalid token')
+          .end(function(err, response) {
+            expect(response).to.have.status(401);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('message', 'Unauthorized access');
+            expect(response.body).to.have.property('internal_code', 'unauthorized');
+            done();
+          });
+      });
+    });
+  });
+  it('should get a message error because no token provided and return 400', done => {
+    createUser().then(() => {
+      loginUser().then(res => {
+        chai
+          .request(app)
+          .get('/users?page=1')
+          .end(function(err, response) {
+            expect(response).to.have.status(400);
+            response.should.be.json;
+            response.body.should.be.a('object');
+            expect(response.body).to.have.property('message', 'No token provided');
+            expect(response.body).to.have.property('internal_code', 'bad_request');
+            done();
+          });
+      });
+    });
   });
 });
