@@ -17,7 +17,7 @@ exports.isAdmin = (req, res, next) => {
 exports.isAuthenticated = (req, res, next) => {
   const token = req.headers['x-access-token'];
   if (token) {
-    jwt.verify(token, config.common.session.secret, function(err, decoded) {
+    jwt.verify(token, config.common.session.secret, (err, decoded) => {
       if (err) next(error.unAuthorizedError('Unauthorized access'));
       req.decoded = decoded;
       next();

@@ -5,7 +5,7 @@ const chai = require('chai'),
   User = require('./../app/models').User,
   user = { name: 'name', lastname: 'lastname', email: 'test@wolox.co', password: '12345678' },
   cookie = require('cookie'),
-  createUser = _ =>
+  createUser = () =>
     chai
       .request(app)
       .post('/users/')

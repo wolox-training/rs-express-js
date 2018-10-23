@@ -67,12 +67,11 @@ exports.createAdminUser = (req, res, next) => {
 
 exports.getAllUsers = (req, res, next) => {
   const limit = 5;
-  let offset = 0;
   const page = req.query.page || 1;
   User.findAndCountAll()
     .then(data => {
       const pages = Math.ceil(data.count / limit);
-      offset = limit * (page - 1);
+      const offset = limit * (page - 1);
       User.findAll({
         limit,
         offset
