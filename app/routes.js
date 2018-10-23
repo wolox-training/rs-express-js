@@ -12,7 +12,7 @@ exports.init = app => {
   app.post('/users', validationResultHandler(signUp), userController.signUp);
   app.post('/users/sessions', validationResultHandler(signIn), userController.signIn);
   app.post(
-    '/admin/users',
+    '/users/admin',
     validationResultHandler(signUp),
     isAuthenticated,
     isAdmin,

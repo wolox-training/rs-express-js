@@ -22,8 +22,7 @@ exports.signUp = (req, res, next) => {
 exports.signIn = (req, res, next) => {
   const { email, password } = req.body;
   return User.findOne({ where: { email } }).then(user => {
-    if (!user) next(error.unAuthorizedError('Invalid credentials'));
-    if (!user.validatePassword(password)) next(error.unAuthorizedError('Invalid credentials'));
+    if (!user || !user.validatePassword(password)) next(error.unAuthorizedError('Invalid credentials'));
     if (user && user.validatePassword(password)) {
       const token = jwt.sign({ id: user.email }, config.common.session.secret);
       res
@@ -78,14 +77,8 @@ exports.getAllUsers = (req, res, next) => {
         limit,
         offset
       })
-        .then(users => {
-          res.status(200).json({ users, count: data.count, pages });
-        })
-        .catch(err => {
-          next(error.dataBaseError('Error in query to find all users'));
-        });
+        .then(users => res.status(200).json({ users, count: data.count, pages }))
+        .catch(err => next(error.dataBaseError('Error in query to find all users')));
     })
-    .catch(err => {
-      next(error.dataBaseError('Error in query to find and count all users'));
-    });
+    .catch(err => next(error.dataBaseError('Error in query to find and count all users')));
 };
