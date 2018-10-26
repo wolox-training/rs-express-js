@@ -16,7 +16,7 @@ const loginUser = () =>
   chai
     .request(app)
     .post('/users/sessions')
-    .send({ email: user.email, password: user.password });
+    .send(user);
 
 const getToken = res => {
   const cookies = res.headers['set-cookie'];
@@ -41,7 +41,7 @@ describe('/users POST', () => {
         });
         expect(res).to.have.status(201);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         res.body.user.should.have.property('name');
         res.body.user.should.have.property('lastname');
         res.body.user.should.have.property('id');
@@ -59,7 +59,7 @@ describe('/users POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('value', '1');
@@ -77,7 +77,7 @@ describe('/users POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('value', '!!!!!!!!');
@@ -96,7 +96,7 @@ describe('/users POST', () => {
         .end(function(err, res) {
           expect(res).to.have.status(500);
           res.should.be.json;
-          res.body.should.be.a('object');
+          expect(res.body).to.exist;
           expect(res.body).to.have.property('message', 'email must be unique');
           expect(res.body).to.have.property('internal_code', 'database_error');
           done();
@@ -111,7 +111,7 @@ describe('/users POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -128,7 +128,7 @@ describe('/users POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -145,7 +145,7 @@ describe('/users POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -162,7 +162,7 @@ describe('/users POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -179,7 +179,7 @@ describe('/users POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -200,7 +200,7 @@ describe('/users/sessions POST', () => {
         .end(function(err, res) {
           expect(res).to.have.status(200);
           res.should.be.json;
-          res.body.should.be.a('object');
+          expect(res.body).to.exist;
           expect(res.body).to.have.property('auth', true);
           expect(res).to.have.cookie('x-access-token');
           dictum.chai(res, 'Login user');
@@ -217,7 +217,7 @@ describe('/users/sessions POST', () => {
         .end(function(err, res) {
           expect(res).to.have.status(401);
           res.should.be.json;
-          res.body.should.be.a('object');
+          expect(res.body).to.exist;
           expect(res.body).to.have.property('message');
           expect(res.body).to.have.property('internal_code', 'unauthorized');
           done();
@@ -232,7 +232,7 @@ describe('/users/sessions POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -249,7 +249,7 @@ describe('/users/sessions POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -266,7 +266,7 @@ describe('/users/sessions POST', () => {
       .end(function(err, res) {
         expect(res).to.have.status(400);
         res.should.be.json;
-        res.body.should.be.a('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
