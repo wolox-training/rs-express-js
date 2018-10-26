@@ -352,7 +352,7 @@ describe('/users/page=1 GET', () => {
             expect(response).to.have.status(500);
             response.should.be.json;
             response.body.should.be.a('object');
-            expect(response.body).to.have.property('message', 'Error in query to find all users');
+            expect(response.body).to.have.property('message', 'Error in query to find and count all users');
             expect(response.body).to.have.property('internal_code', 'database_error');
             done();
           });
