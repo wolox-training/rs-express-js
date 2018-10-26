@@ -40,7 +40,7 @@ describe('/users POST', () => {
           expect(count).to.equal(1);
         });
         expect(res).to.have.status(201);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body.user).to.have.property('name', 'name');
         expect(res.body.user).to.have.property('lastname', 'lastname');
         expect(res.body.user).to.have.property('id');
@@ -55,8 +55,8 @@ describe('/users POST', () => {
       .send({ name: 'name', lastname: 'lastname', email: 'test2@wolox.co', password: '1' })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res).to.be.a('object');
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('value', '1');
@@ -73,7 +73,7 @@ describe('/users POST', () => {
       .send({ name: 'name', lastname: 'lastname', email: 'test2@wolox.co', password: '!!!!!!!!' })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('value', '!!!!!!!!');
@@ -91,7 +91,7 @@ describe('/users POST', () => {
         .send(user)
         .end((err, res) => {
           expect(res).to.have.status(500);
-          expect(res.body).to.be.an('object');
+          expect(res.body).to.exist;
           expect(res.body).to.have.property('message', 'email must be unique');
           expect(res.body).to.have.property('internal_code', 'database_error');
           done();
@@ -105,7 +105,7 @@ describe('/users POST', () => {
       .send({ name: 'name', email: 'test@wolox.co', password: '12345678' })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -121,7 +121,7 @@ describe('/users POST', () => {
       .send({ name: 'name', lastname: 'lastname', password: '12345678' })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -137,7 +137,7 @@ describe('/users POST', () => {
       .send({ lastname: 'lastname', email: 'test@wolox.co', password: '12345678' })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -153,7 +153,7 @@ describe('/users POST', () => {
       .send({ name: user.name, lastname: user.lastname, email: 'test@hotmail.com', password: user.password })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -169,7 +169,8 @@ describe('/users POST', () => {
       .send({ name: user.name, lastname: user.lastname, email: user.email })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -189,7 +190,8 @@ describe('/users/sessions POST', () => {
         .send({ email: user.email, password: user.password })
         .end((err, res) => {
           expect(res).to.have.status(200);
-          expect(res.body).to.be.an('object');
+
+          expect(res.body).to.exist;
           expect(res.body).to.have.property('auth', true);
           expect(res).to.have.cookie('x-access-token');
           dictum.chai(res, 'Login user');
@@ -205,7 +207,7 @@ describe('/users/sessions POST', () => {
         .send({ email: user.email, password: 'invalid' })
         .end((err, res) => {
           expect(res).to.have.status(401);
-          expect(res.body).to.be.an('object');
+          expect(res.body).to.exist;
           expect(res.body).to.have.property('message');
           expect(res.body).to.have.property('internal_code', 'unauthorized');
           done();
@@ -219,7 +221,7 @@ describe('/users/sessions POST', () => {
       .send({ password: user.password })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -235,7 +237,7 @@ describe('/users/sessions POST', () => {
       .send({ email: 'test@hotmail.com', password: '12345678' })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -251,7 +253,7 @@ describe('/users/sessions POST', () => {
       .send({ email: user.email })
       .end((err, res) => {
         expect(res).to.have.status(400);
-        expect(res.body).to.be.an('object');
+        expect(res.body).to.exist;
         expect(res.body).to.have.property('message');
         expect(res.body).to.have.property('internal_code', 'bad_request');
         expect(res.body.message[0]).to.have.property('location', 'body');
@@ -272,7 +274,7 @@ describe('/users/page=1 GET', () => {
           .set('x-access-token', getToken(res))
           .end((err, response) => {
             expect(response).to.have.status(200);
-            expect(response.body).to.be.an('object');
+            expect(response.body).to.exist;
             expect(response.body).to.have.property('users');
             expect(response.body.users).to.be.an('array');
             expect(response.body.users.length).to.equal(1);
@@ -293,7 +295,7 @@ describe('/users/page=1 GET', () => {
           .set('x-access-token', getToken(res))
           .end((err, response) => {
             expect(response).to.have.status(200);
-            expect(response.body).to.be.an('object');
+            expect(response.body).to.exist;
             expect(response.body).to.have.property('users');
             expect(response.body.users).to.be.an('array');
             expect(response.body.users.length).to.equal(0);
@@ -313,7 +315,7 @@ describe('/users/page=1 GET', () => {
           .set('x-access-token', getToken(res))
           .end((err, response) => {
             expect(response).to.have.status(200);
-            expect(response.body).to.be.an('object');
+            expect(response.body).to.exist;
             expect(response.body).to.have.property('users');
             expect(response.body.users).to.be.an('array');
             expect(response.body).to.have.property('count', 1);
@@ -332,8 +334,8 @@ describe('/users/page=1 GET', () => {
           .set('x-access-token', getToken(res))
           .end((err, response) => {
             expect(response).to.have.status(500);
-            expect(response.body).to.be.an('object');
-            expect(response.body).to.have.property('message', 'Error in query to find all users');
+            expect(response.body).to.exist;
+            expect(response.body).to.have.property('message', 'Error in query to find and count all users');
             expect(response.body).to.have.property('internal_code', 'database_error');
             done();
           });
@@ -349,7 +351,7 @@ describe('/users/page=1 GET', () => {
           .set('x-access-token', 'invalid token')
           .end((err, response) => {
             expect(response).to.have.status(401);
-            expect(response.body).to.be.an('object');
+            expect(response.body).to.exist;
             expect(response.body).to.have.property('message', 'Unauthorized access');
             expect(response.body).to.have.property('internal_code', 'unauthorized');
             done();
@@ -365,7 +367,7 @@ describe('/users/page=1 GET', () => {
           .get('/users?page=1')
           .end((err, response) => {
             expect(response).to.have.status(400);
-            expect(response.body).to.be.an('object');
+            expect(response.body).to.exist;
             expect(response.body).to.have.property('message', 'No token provided');
             expect(response.body).to.have.property('internal_code', 'bad_request');
             done();
@@ -391,7 +393,7 @@ describe('/users/admin POST', () => {
           .set('x-access-token', getToken(res))
           .end((err, response) => {
             expect(response).to.have.status(201);
-            expect(response.body).to.be.an('object');
+            expect(response.body).to.exist;
             expect(response.body.user).to.have.property('name', 'name');
             expect(response.body.user).to.have.property('lastname', 'lastname');
             expect(response.body.user).to.have.property('id');
@@ -412,7 +414,7 @@ describe('/users/admin POST', () => {
           .set('x-access-token', getToken(res))
           .end((err, response) => {
             expect(response).to.have.status(401);
-            expect(response.body).to.be.an('object');
+            expect(response.body).to.exist;
             expect(response.body).to.have.property('message');
             expect(response.body).to.have.property('internal_code', 'unauthorized');
             done();
